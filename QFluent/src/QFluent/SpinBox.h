@@ -7,6 +7,7 @@
 #include <QDateTimeEdit>
 #include <QToolButton>
 #include <QPointer>
+#include <QPainter>
 #include <QScopedPointer>
 
 #include "FluentGlobal.h"
@@ -126,3 +127,41 @@ public:
     using Base = InlineSpinBoxBase<QDateEdit>;
     using Base::Base;
 };
+
+template <typename T>
+InlineSpinBoxBase<T>::InlineSpinBoxBase(QWidget *parent)
+    : T(parent)
+    , m_helper(new SpinBoxBase(this))
+{
+    m_helper->addUpDownButtons();
+    m_helper->setup();
+}
+
+template <typename T>
+void InlineSpinBoxBase<T>::setError(bool isError)
+{
+    m_helper->setError(isError);
+}
+
+template <typename T>
+bool InlineSpinBoxBase<T>::isError() const
+{
+    return m_helper->isError();
+}
+
+template <typename T>
+void InlineSpinBoxBase<T>::setSymbolVisible(bool visible)
+{
+    m_helper->setSymbolVisible(visible);
+}
+
+template <typename T>
+void InlineSpinBoxBase<T>::paintEvent(QPaintEvent *event)
+{
+    T::paintEvent(event);
+
+    if (this->hasFocus() && !isError()) {
+        QPainter painter(this);
+        m_helper->drawFocusBorder(&painter, this->rect());
+    }
+}

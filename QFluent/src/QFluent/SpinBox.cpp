@@ -3,7 +3,6 @@
 #include <QMenu>
 #include <QLineEdit>
 #include <QHBoxLayout>
-#include <QPainter>
 #include <QPainterPath>
 #include <QStyleOption>
 #include <QContextMenuEvent>
@@ -14,11 +13,6 @@
 #include "FluentIcon.h"
 #include "StyleSheet.h"
 
-template class InlineSpinBoxBase<QSpinBox>;
-template class InlineSpinBoxBase<QDoubleSpinBox>;
-template class InlineSpinBoxBase<QTimeEdit>;
-template class InlineSpinBoxBase<QDateTimeEdit>;
-template class InlineSpinBoxBase<QDateEdit>;
 
 // --- SpinButton ---
 
@@ -181,43 +175,4 @@ void SpinBoxBase::drawFocusBorder(QPainter *painter, const QRect &rect)
     path = path.subtracted(rectPath);
 
     painter->fillPath(path, Theme::themeColor(Fluent::ThemeColor::PRIMARY));
-}
-
-// --- InlineSpinBoxBase ---
-
-template <typename T>
-InlineSpinBoxBase<T>::InlineSpinBoxBase(QWidget *parent)
-    : T(parent)
-    , m_helper(new SpinBoxBase(this))
-{
-    m_helper->addUpDownButtons();
-    m_helper->setup();
-}
-
-template <typename T>
-void InlineSpinBoxBase<T>::setError(bool isError)
-{
-    m_helper->setError(isError);
-}
-
-template <typename T>
-bool InlineSpinBoxBase<T>::isError() const
-{
-    return m_helper->isError();
-}
-
-template <typename T>
-void InlineSpinBoxBase<T>::setSymbolVisible(bool visible)
-{
-    m_helper->setSymbolVisible(visible);
-}
-
-template <typename T>
-void InlineSpinBoxBase<T>::paintEvent(QPaintEvent *event)
-{
-    T::paintEvent(event);
-    if (this->hasFocus() && !isError()) {
-        QPainter painter(this);
-        m_helper->drawFocusBorder(&painter, this->rect());
-    }
 }
